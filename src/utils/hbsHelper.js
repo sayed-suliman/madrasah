@@ -3,6 +3,7 @@ const hbs = require("hbs");
 const { grade } = require("../config/system");
 
 hbs.registerHelper("ifEqual", function (arg1, arg2, options) {
+  console.log('arg1', arg1)
   return arg1 == arg2 ? options.fn(this) : options.inverse(this);
 });
 

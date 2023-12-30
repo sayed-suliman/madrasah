@@ -40,10 +40,17 @@
                                 </button>
                             </div>
                             <div class="box-body col-6">
+                                {{#ifEqual this.status 'pending'}}
                                 <button type="button" data-id="{{this.id}}"
                                     class="btn d-grid btn-primary-light send-btn" style="width: 100%;">
                                     Send
                                 </button>
+                                {{else}}
+                                <button type="button" class="btn d-grid btn-primary-light disabled"
+                                    style="width: 100%;">
+                                    Sent
+                                </button>
+                                {{/ifEqual}}
                             </div>
                         </div>
                     </div>
@@ -296,6 +303,9 @@
 
 
         $('button.send-btn').click(function () {
+            // took send button to make it disabled in later.
+            let sendBtn = $(this);
+
             let feeId = $(this).data('id');
             let admission = `{{{ id }}}`;
             console.log(admission);
@@ -312,7 +322,8 @@
                 contentType: 'application/json', // Specify content type for JSON data
                 dataType: 'json', // Specify the expected response type
                 success: function (response) {
-                    console.log("status", response);
+                    $(sendBtn).addClass('disabled').removeClass('send-btn');
+                    $(sendBtn).text("Sent");
                     // Handle success response if needed
                     console.log("Form submitted successfully:", response);
                 },

@@ -131,7 +131,6 @@ module.exports = {
     // send fee docs to students
     async sendFee(req, res) {
         try {
-            console.log('body', req.body);
             const { admission } = req.body
             const fee = req.params.id;
             const data = {
@@ -146,12 +145,13 @@ module.exports = {
                 { $push: { fees: data }, },
                 { new: true }
             );
-            console.log('here', students);
+            if (students.acknowledged) {
+                await Fee.findByIdAndUpdate(fee, { status: 'sent' });
+            }
             return res.send({ students, body: req.body });
         } catch (err) {
             console.log('error in the last', err);
-            // req.flash("error", " : findFee/ صارفین دیکھتے وقت خرابی:۔" + err.message);
-            // return res.redirect("/");
+            return res.status(501).send({ err });
         }
     }
 };

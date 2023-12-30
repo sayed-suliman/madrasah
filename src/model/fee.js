@@ -9,7 +9,7 @@ const feeRecordSchema = new mongoose.Schema({
   status: {
     type: String,
     default: 'pending',
-    enum: ['pending', 'paid']
+    enum: ['pending', 'sent']
   }, // 'Pending', 'Paid', 'Discounted', etc.
 }, {
   timestamps: true
