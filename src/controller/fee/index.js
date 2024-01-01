@@ -181,5 +181,17 @@ module.exports = {
             console.log('error in the last', err);
             return res.status(501).send({ err });
         }
-    }
+    },
+    //show single sutdent
+    async singleStudent(req, res) {
+        try {
+            const id = req.params.id;
+            const { name, fees } = await Student.findById(id).select('name fees').populate('fees.fee');
+            console.log('studnets', name, 'fees', fees);
+            return res.render('fee/singleStudent', { name, fees });
+        } catch (err) {
+            req.flash("error", " : fee/student/id صارفین دیکھتے وقت خرابی:۔" + err.message);
+            return res.redirect("/");
+        }
+    },
 };
