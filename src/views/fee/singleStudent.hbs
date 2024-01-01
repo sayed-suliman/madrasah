@@ -20,8 +20,51 @@
 
         <!-- Main content -->
         <section class="content">
-            <div class="row mt-25">
+            <div class="row">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="table-responsive">
+                            <table id="example"
+                                class="table table-bordered table-hover display nowrap margin-top-10 w-p100">
+                                <thead>
+                                    <tr>
+                                        <th>نام</th>
+                                        <th>amount</th>
+                                        <th>حالت</th>
+                                        <th>کارروائی</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each fees}}
+                                    <tr>
+                                        <td>{{this.fee.name}}</td>
+                                        <td>{{this.fee.amount}}</td>
+                                        <td>
+                                            {{#ifEqual this.status 'pending'}}
+                                            <div class="px-25 py-10 w-100">
+                                                <span class="badge badge-danger">بلا معاوضہ</span>
+                                            </div>
+                                            {{else}}
+                                            <div class="px-25 py-10 w-100">
+                                                <span class="badge badge-success">ادا کیا</span>
+                                            </div>
+                                            {{/ifEqual}}
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-success px-2 py-1 me-1"
+                                                href="/fee/student/{{../id}}?feeid={{this._id}}">pay<i
+                                                    class="mdi mdi-account-edit"></i></a>
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
 
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
             </div>
             <!-- /.row -->
 

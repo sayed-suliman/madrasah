@@ -186,9 +186,9 @@ module.exports = {
     async singleStudent(req, res) {
         try {
             const id = req.params.id;
-            const { name, fees } = await Student.findById(id).select('name fees').populate('fees.fee');
-            console.log('studnets', name, 'fees', fees);
-            return res.render('fee/singleStudent', { name, fees });
+            // exclude status from fee population.
+            const { name, fees } = await Student.findById(id).select('name fees').populate({ path: 'fees.fee', select: '-status' });
+            return res.render('fee/singleStudent', { name, fees, id });
         } catch (err) {
             req.flash("error", " : fee/student/id صارفین دیکھتے وقت خرابی:۔" + err.message);
             return res.redirect("/");
