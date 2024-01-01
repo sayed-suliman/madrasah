@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const ClassModel = require("../../model/class");
 const Fee = require("../../model/fee");
 const Student = require("../../model/student");
@@ -8,7 +9,9 @@ module.exports = {
             // const classes = await ClassModel.find().select('name');
             const classes = await ClassModel.aggregate([
                 {
-                    $match: {} // Match all classes or add any specific conditions here
+                    $match: {
+                        status: 'publish'
+                    } // Match all classes or add any specific conditions here
                 },
                 {
                     $lookup: {
@@ -35,14 +38,38 @@ module.exports = {
             return res.redirect("/");
         }
     },
+    // read fee single class
     async class(req, res) {
         try {
             const admission = req.params.id;
-            const students = await Student.find({ admission }).populate('admission');
+            // const students = await Student.find({ admission, status: 'publish' }).populate('fees.fee');
+            // console.log('studnets', students);
+            // here it will find sutdents and also add field pending for fees if student have any pending payment
+            // then payment pending should be true
+            const students = await Student.aggregate([
+                {
+                    $match: { admission: new mongoose.Types.ObjectId(admission), status: 'publish' } // Your initial match stage
+                },
+                {
+                    $addFields: {
+                        pending: {
+                            $anyElementTrue: {
+                                $map: {
+                                    input: '$fees',
+                                    in: { $eq: ['$$this.status', 'pending'] }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]);
+            console.log('test', students);
+            // students.forEach((std, index) => console.log('indeex : ', index, ' : ', std.fees))
             return res.render('fee/allStudents', {
                 students
             });
         } catch (err) {
+            console.log(err.message);
             req.flash("error", "صارفین دیکھتے وقت خرابی:۔" + err.message);
             return res.redirect("/");
         }
@@ -50,7 +77,7 @@ module.exports = {
     // fee portal
     async portal(req, res) {
         try {
-            const classes = await ClassModel.find().select('name');
+            const classes = await ClassModel.find({ status: 'publish' }).select('name');
             return res.render('fee/feePortal', { classes });
         } catch (err) {
             req.flash("error", " : fee/portal صارفین دیکھتے وقت خرابی:۔" + err.message);
@@ -61,8 +88,9 @@ module.exports = {
     async portalClass(req, res) {
         try {
             const admission = req.params.id;
-            const { fee } = await ClassModel.findById(admission).select('fee').populate('fee');
-            return res.render('fee/feePortalSingleClass', { id: admission, fees: fee });
+            const result = await ClassModel.findById(admission).select('fee name').populate('fee');
+            const { name, fee } = result;
+            return res.render('fee/feePortalSingleClass', { id: admission, fees: fee, name });
         } catch (err) {
             req.flash("error", " : fee/portal/class/ صارفین دیکھتے وقت خرابی:۔" + err.message);
             return res.redirect("/");
@@ -141,7 +169,7 @@ module.exports = {
             //     { admission })
             // console.log(students)
             const students = await Student.updateMany(
-                { admission },
+                { admission, satus: 'publish' },
                 { $push: { fees: data }, },
                 { new: true }
             );

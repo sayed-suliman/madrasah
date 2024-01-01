@@ -32,9 +32,7 @@
                                         <th>رول نمبر</th>
                                         <th>نام</th>
                                         <th>والد کا نام</th>
-                                        <th>کلاس</th>
                                         <th>موبائل نمبر</th>
-                                        <th>پتہ</th>
                                         <th>حالت</th>
                                         <th>کارروائی</th>
                                     </tr>
@@ -45,10 +43,18 @@
                                         <td>{{this.rollNumber}}</td>
                                         <td>{{this.name}}</td>
                                         <td>{{this.fatherName}}</td>
-                                        <td>{{this.admission.name}}</td>
                                         <td>{{this.phone}}</td>
-                                        <td>{{this.address}}</td>
-                                        <td></td>
+                                        <td>
+                                            {{#if this.pending}}
+                                            <div class="px-25 py-10 w-100">
+                                                <span class="badge badge-danger">بلا معاوضہ</span>
+                                            </div>
+                                            {{else}}
+                                            <div class="px-25 py-10 w-100">
+                                                <span class="badge badge-success">ادا کیا</span>
+                                            </div>
+                                            {{/if}}
+                                        </td>
                                         <td>
                                             <a class="btn btn-success px-2 py-1 me-1"
                                                 href="/fee/student?id={{this._id}}"><i
