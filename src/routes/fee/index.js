@@ -19,4 +19,6 @@ router.get('/portal/:id', fee.findFee);
 router.post('/sendfee/:id', fee.sendFee);
 // just for check single page for student and show all their fees. 
 router.get('/student/:id', fee.singleStudent);
+// paying fee
+router.patch('/student', fee.payingStudent);
 module.exports = router;

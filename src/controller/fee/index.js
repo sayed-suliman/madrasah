@@ -53,17 +53,24 @@ module.exports = {
                 {
                     $addFields: {
                         pending: {
-                            $anyElementTrue: {
-                                $map: {
-                                    input: '$fees',
-                                    in: { $eq: ['$$this.status', 'pending'] }
-                                }
+                            $cond: {
+                                if: {
+                                    $isArray: '$fees',
+                                },
+                                then: {
+                                    $anyElementTrue: {
+                                        $map: {
+                                            input: '$fees',
+                                            in: { $eq: ['$$this.status', 'pending'] }
+                                        }
+                                    }
+                                },
+                                else: false
                             }
                         }
                     }
                 }
             ]);
-            console.log('test', students);
             // students.forEach((std, index) => console.log('indeex : ', index, ' : ', std.fees))
             return res.render('fee/allStudents', {
                 students
@@ -165,18 +172,22 @@ module.exports = {
                 fee,
                 status: 'pending'
             };
+            console.log(data);
             // const students = await Student.findOneAndUpdate(
             //     { admission })
-            // console.log(students)
+            console.log(admission)
             const students = await Student.updateMany(
-                { admission, satus: 'publish' },
+                { admission: new mongoose.Types.ObjectId(admission), status: 'publish' },
                 { $push: { fees: data }, },
                 { new: true }
             );
-            if (students.acknowledged) {
+            console.log('students', students);
+            if (students.modifiedCount) {
                 await Fee.findByIdAndUpdate(fee, { status: 'sent' });
+                return res.send({ students, body: req.body });
+            } else {
+                throw new Error('Users not found');
             }
-            return res.send({ students, body: req.body });
         } catch (err) {
             console.log('error in the last', err);
             return res.status(501).send({ err });
@@ -192,6 +203,29 @@ module.exports = {
         } catch (err) {
             req.flash("error", " : fee/student/id صارفین دیکھتے وقت خرابی:۔" + err.message);
             return res.redirect("/");
+        }
+    },
+    // paying student fee
+    async payingStudent(req, res) {
+        try {
+            const { userId, feeId } = req.body;
+            const user = await Student.findByIdAndUpdate(userId,
+                {
+                    $set: { 'fees.$[elem].status': 'completed' }
+                },
+                {
+                    arrayFilters: [{ 'elem._id': feeId }]
+                },
+                { new: true }
+            );
+            if (user) {
+                return res.send({ user: user });
+            } else {
+                throw new Error('User not found');
+            }
+            return res.send({ body: req.body })
+        } catch (err) {
+            return res.status(501).send({ err: err.message });
         }
     },
 };
