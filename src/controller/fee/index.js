@@ -209,6 +209,7 @@ module.exports = {
     async payingStudent(req, res) {
         try {
             const { userId, feeId } = req.body;
+            console.log(req.body);
             const user = await Student.findByIdAndUpdate(userId,
                 {
                     $set: { 'fees.$[elem].status': 'completed' }

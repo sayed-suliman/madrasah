@@ -169,45 +169,45 @@
                 closeOnCancel: false,
             }, function (isConfirm) {
                 if (isConfirm) {
+                    console.log('isconfirm true', isConfirm);
+
+                    //ajax start
                     $.ajax({
                         type: 'patch', // Get the form's method attribute
                         url: `/fee/student`, // Get the form's action attribute
                         data: data,
                         success: function (response) {
-                            swal("Paid!", "The given student had paid this fee", "success");
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 1000)
+                            swal(
+                                {
+                                    title: "Paid!",
+                                    text: "he given student had paid this fee",
+                                    type: "success",
+                                },
+                                function (isConfirm) {
+                                    window.location.reload();
+                                }
+                            );
                         },
                         error: function (error) {
+                            const { err } = error.responseJSON;
                             // Handle error response if needed
-                            swal("Cancelled", `Can't paid:)  ${error} `, 'error');
+                            swal(
+                                {
+                                    title: "Cancelled!",
+                                    text: `Can't paid:)  ${err} `,
+                                    type: "error",
+                                },
+                            );
                         }
                     });
 
                     //end ajax
 
                 } else {
+                    console.log('isconfirm false', isConfirm);
                     swal("Cancelled", "Your imaginary file is safe :)", "error");
                 }
             });
-
-            // end swal
-
-            $.ajax({
-                type: 'patch', // Get the form's method attribute
-                url: `/fee/student`, // Get the form's action attribute
-                data: data,
-                success: function (response) {
-
-                },
-                error: function (error) {
-                    // Handle error response if needed
-                    console.error("Error submitting form:", error);
-                }
-            });
-
-            //end ajax
 
 
 
