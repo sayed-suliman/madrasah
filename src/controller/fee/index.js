@@ -95,7 +95,36 @@ module.exports = {
     async portalClass(req, res) {
         try {
             const admission = req.params.id;
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1; // Months are zero-indexed, so we add 1 to get the current month
+
             const result = await ClassModel.findById(admission).select('fee name').populate('fee');
+            console.log(result);
+            const currentMonthFee = await ClassModel.aggregate([
+                {
+                    $match: { _id: admission }
+                },
+                {
+                    $lookup: {
+                        from: 'fees',
+                        localField: 'fee',
+                        foreignField: '_id',
+                        as: 'fee'
+                    }
+                },
+                // {
+                //     $addFields: {
+                //         fee: {
+                //             $filter: {
+                //                 input: "$fee",
+                //                 as: "fee",
+                //                 cond: { $eq: [{ $month: { $toDate: "$$fee.createdAt" } }, currentMonth] }
+                //             }
+                //         }
+                //     }
+                // }
+            ]);
+            console.log('currentMonthFee', currentMonthFee);
             const { name, fee } = result;
             return res.render('fee/feePortalSingleClass', { id: admission, fees: fee, name });
         } catch (err) {
